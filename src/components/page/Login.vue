@@ -59,6 +59,7 @@ export default {
     return {
       loginVisible: false,
       sendLoading: false,
+      ifLogin: false,
       errorMessage: '',
       param: {
         username: '',
@@ -131,21 +132,27 @@ export default {
         callback()
       }
     },
+    async postAuthApi() {
+      const res = await axios.post('fake-auth', {
+        name: this.param.username,
+        email: this.param.email,
+      })
+      return res
+    },
     submitForm() {
       this.errorMessage = ''
       this.$refs.login.validate(async (valid) => {
         if (valid) {
           this.sendLoading = true
-          const res = await axios.post('fake-auth', {
-            name: this.param.username,
-            email: this.param.email,
-          })
+          const res = await this.postAuthApi()
           this.sendLoading = false
           if (res.success) {
+            this.ifLogin = true
             this.$alert('Thank you', 'All Done！', {
               confirmButtonText: 'OK',
               callback: (action) => {
                 this.loginVisible = false
+                this.ifLogin = false
               },
             })
           } else {
@@ -161,6 +168,7 @@ export default {
       this.loginVisible = true
       this.errorMessage = ''
       this.sendLoading = false
+      this.ifLogin = false
     },
   },
 }
